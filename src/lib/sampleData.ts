@@ -1,0 +1,22 @@
+// The messy sample, inlined so the static build has no runtime file reads.
+// Mirrors samples/messy_transactions.csv — every failure mode in one small set.
+
+export const SAMPLE_NAME = "messy_transactions.csv";
+
+export const SAMPLE_CSV = `order_id,customer_name,email,phone,city,amount,payment_mode,order_date
+ORD-1001,Aarav Sharma,aarav.sharma@gmail.com,9876543210,Delhi,1299.00,UPI,2025-04-01
+ORD-1002, Priya Patel ,priya.patel@yahoo,+91 98765 43211,Mumbai,"2,499",Credit Card,2025-04-03
+ORD-1003,Rahul Verma,rahul.verma@gmail.com,98765,Bangalore,₹799,Debit Card,2025-13-05
+ORD-1004,Sneha Reddy,sneha reddy@gmail.com,919876543212,Hyderabad,-450,UPI,2025-04-07
+ORD-1005,Wei Lim,wei.lim@gmail.com,91234567,Singapore,38.50,PayNow,07/04/2025
+ORD-1006,John Smith,john.smith@gmail.com,5551234567,New York,120.00,Card,04/15/2025
+ORD-1007,Karthik Nair,,8765432109,Chennai,560,Cash,2025-04-09
+ORD-1008,Meera Iyer,meera.iyer@gmail.com,0098765432,Pune,899.99,UPI,2025-04-31
+ORD-1009,Tan Ah Kow,tan.ahkow@gmail.com,6512345678,Singapore,76.00,PayNow,2025-04-11
+ORD-1010,Vikram Singh,vikram@@gmail.com,+91-99887-76655,Jaipur,1450,Net Banking,2025/04/12
+ORD-1011,Ananya Das,ananya.das@gmail.com,98765432101,Kolkata,675.50,UPI,2025-04-13
+ORD-1012,Rohit Mehta,rohit.mehta@gmail.com,,Ahmedabad,,Credit Card,
+ORD-1013,Divya Menon,divya.menon@gmail.com,7654321098,Kochi,320.00,UPI,15-04-2025
+ORD-1014,Arjun Kapoor,arjun.kapoor@gmail.com,9988776655,Delhi,2100,Debit Card,2025-04-14
+ORD-1015,Fatima Khan,fatima.khan@gmail.com,8899001122,Lucknow,540.25,UPI,2025-04-16
+`;

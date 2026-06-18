@@ -1,0 +1,124 @@
+.zone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: clamp(2.5rem, 1.5rem + 5vw, 4.5rem) 2rem;
+  background: var(--paper-raised);
+  border: 1.5px dashed var(--line-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  text-align: center;
+  transition: border-color var(--duration) var(--ease), transform var(--duration) var(--ease),
+    box-shadow var(--duration) var(--ease), background var(--duration) var(--ease);
+}
+
+.zone:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.zone:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.dragging {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  transform: scale(1.01);
+  box-shadow: var(--shadow-lg);
+}
+
+.icon {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 0.5rem;
+}
+
+.iconSheet {
+  position: absolute;
+  inset: 6px 12px;
+  border: 2px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent-soft);
+}
+
+.iconArrow {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent);
+  animation: bob 2.4s var(--ease) infinite;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(2px); }
+  50% { transform: translateY(-3px); }
+}
+
+.lead {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.or {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.hint {
+  font-size: var(--text-sm);
+  color: var(--ink-faint);
+}
+
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.footnote {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding: 0 0.25rem;
+}
+
+.sample {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  padding: 0.25rem 0;
+  transition: opacity var(--duration) var(--ease);
+}
+
+.sample:hover {
+  opacity: 0.7;
+}
+
+.privacy {
+  font-size: var(--text-xs);
+  color: var(--ink-faint);
+}
+
+.error {
+  margin-top: 0.75rem;
+  color: var(--bad);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
