@@ -1,0 +1,16 @@
+{
+  "name": "xeno-data-copilot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A data-onboarding co-pilot: validate, auto-detect, clean and chunk messy transaction CSVs entirely in the browser.",
+  "type": "module",
+  "scripts": {
+    "smoke": "tsx scripts/smoke.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.21",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
