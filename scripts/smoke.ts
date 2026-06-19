@@ -9,7 +9,11 @@ import { chunkTable } from "../src/lib/chunk.ts";
 import { planColumns, validateTable, cleanTable } from "../src/lib/validation/engine.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const csv = readFileSync(join(here, "../samples/messy_transactions.csv"), "utf8");
+// Optional CLI arg: a path to any CSV. Defaults to the bundled messy sample.
+const arg = process.argv[2];
+const csvPath = arg ? (arg.startsWith("/") ? arg : join(process.cwd(), arg)) : join(here, "../samples/messy_transactions.csv");
+const csv = readFileSync(csvPath, "utf8");
+console.log(`Source: ${csvPath}`);
 const table = parseCsv(csv);
 
 console.log(`\nParsed ${table.rows.length} rows, ${table.headers.length} columns\n`);

@@ -24,4 +24,22 @@ export function reprocess(table: Table, plan: ColumnPlan[]): ValidationResult {
   return validateTable(table, plan);
 }
 
+/**
+ * Manual fixes the user typed, keyed by `"rowIndex:columnIndex"`. Applied on
+ * top of the raw table so everything downstream (validation, cleaning, export)
+ * re-runs against the corrected value — a fixed cell simply stops being an issue.
+ */
+export type Overrides = Record<string, string>;
+
+export function applyOverrides(table: Table, overrides: Overrides): Table {
+  if (Object.keys(overrides).length === 0) return table;
+  const rows = table.rows.map((row, r) =>
+    row.map((cell, c) => {
+      const key = `${r}:${c}`;
+      return key in overrides ? overrides[key]! : cell;
+    })
+  );
+  return { headers: table.headers, rows };
+}
+
 export { cleanTable };

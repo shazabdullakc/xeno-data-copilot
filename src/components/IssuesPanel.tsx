@@ -8,7 +8,12 @@ type Filter = "all" | "error" | "fixable";
 
 const PAGE = 50;
 
-export function IssuesPanel({ issues }: { issues: readonly CellIssue[] }) {
+interface IssuesPanelProps {
+  issues: readonly CellIssue[];
+  onEdit: (rowIndex: number, column: string, value: string) => void;
+}
+
+export function IssuesPanel({ issues, onEdit }: IssuesPanelProps) {
   const [filter, setFilter] = useState<Filter>("all");
   const [limit, setLimit] = useState(PAGE);
 
@@ -25,7 +30,7 @@ export function IssuesPanel({ issues }: { issues: readonly CellIssue[] }) {
     return (
       <section className={styles.empty}>
         <span className={styles.emptyMark}>✓</span>
-        <p>No issues found. This dataset is onboarding-ready.</p>
+        <p>No issues left. This dataset is onboarding-ready.</p>
       </section>
     );
   }
@@ -42,23 +47,7 @@ export function IssuesPanel({ issues }: { issues: readonly CellIssue[] }) {
 
       <ul className={styles.list}>
         {shown.map((issue, i) => (
-          <li key={`${issue.rowIndex}-${issue.column}-${i}`} className={styles.row}>
-            <span className={`${styles.dot} ${styles[issue.severity]}`} aria-hidden />
-            <span className={styles.loc}>
-              row {issue.rowIndex + 1} · <strong>{issue.column}</strong>
-            </span>
-            <span className={styles.msg}>{issue.message}</span>
-            <span className={styles.raw} title={issue.rawValue || "(empty)"}>
-              {issue.rawValue || "(empty)"}
-            </span>
-            {issue.suggestedFix !== undefined ? (
-              <span className={styles.fix}>
-                → <code>{issue.suggestedFix || "(removed)"}</code>
-              </span>
-            ) : (
-              <span className={styles.noFix}>needs manual review</span>
-            )}
-          </li>
+          <IssueRow key={`${issue.rowIndex}-${issue.column}-${i}`} issue={issue} onEdit={onEdit} />
         ))}
       </ul>
 
@@ -68,6 +57,49 @@ export function IssuesPanel({ issues }: { issues: readonly CellIssue[] }) {
         </button>
       )}
     </section>
+  );
+}
+
+function IssueRow({ issue, onEdit }: { issue: CellIssue; onEdit: IssuesPanelProps["onEdit"] }) {
+  const [value, setValue] = useState(issue.rawValue);
+  const apply = () => {
+    if (value !== issue.rawValue) onEdit(issue.rowIndex, issue.column, value);
+  };
+
+  return (
+    <li className={styles.row}>
+      <span className={`${styles.dot} ${styles[issue.severity]}`} aria-hidden />
+      <span className={styles.loc}>
+        row {issue.rowIndex + 1} · <strong>{issue.column}</strong>
+      </span>
+      <span className={styles.msg}>{issue.message}</span>
+
+      <div className={styles.editor}>
+        <input
+          className={styles.input}
+          value={value}
+          placeholder="(empty)"
+          aria-label={`Fix ${issue.column} on row ${issue.rowIndex + 1}`}
+          onChange={(e) => setValue(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && apply()}
+          onBlur={apply}
+        />
+        {issue.suggestedFix !== undefined && issue.suggestedFix !== value && (
+          <button
+            type="button"
+            className={styles.useFix}
+            title={`Use suggested fix: ${issue.suggestedFix || "(remove)"}`}
+            onClick={() => {
+              setValue(issue.suggestedFix!);
+              onEdit(issue.rowIndex, issue.column, issue.suggestedFix!);
+            }}
+          >
+            use fix: <code>{issue.suggestedFix || "∅"}</code>
+          </button>
+        )}
+        {issue.suggestedFix === undefined && <span className={styles.manual}>type a value →</span>}
+      </div>
+    </li>
   );
 }
 
