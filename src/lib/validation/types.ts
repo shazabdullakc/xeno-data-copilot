@@ -44,6 +44,7 @@ export interface ValidationResult {
   readonly rowCount: number;
   readonly columns: readonly ColumnReport[];
   readonly issues: readonly CellIssue[];
+  readonly duplicateRows: readonly number[]; // indices of rows that duplicate an earlier row
   readonly healthScore: number; // 0..100
   readonly summary: string; // one-line plain-English verdict
 }

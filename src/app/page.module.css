@@ -75,6 +75,29 @@
   border-radius: 999px;
 }
 
+.dupeNote {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-bottom: 1rem;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid var(--warn);
+  border-left-width: 4px;
+  border-radius: var(--radius);
+  background: var(--warn-soft);
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+
+.dupeNote strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.dupeNote span {
+  color: var(--ink-soft);
+}
+
 .footer {
   display: flex;
   justify-content: space-between;

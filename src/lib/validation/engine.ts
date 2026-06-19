@@ -6,6 +6,7 @@ import { CellIssue, ColumnReport, FieldType, Table, ValidationResult } from "./t
 import { detectColumnType } from "./detect/columnType";
 import { detectPhoneCountry } from "./detect/phoneCountry";
 import { detectDateFormat } from "./detect/dateFormat";
+import { findDuplicateRows } from "./detect/duplicates";
 import { parsePhone } from "./validators/phone";
 import { parseDate, DateFormat } from "./validators/date";
 import { parseEmail } from "./validators/email";
@@ -116,8 +117,12 @@ export function validateTable(table: Table, plan?: ColumnPlan[]): ValidationResu
     fixableCount: perColumnFixable.get(p.name) ?? 0,
   }));
 
+  const duplicateRows = findDuplicateRows(table);
+
+  // Cell issues weight by severity; each duplicate row adds a warning-equivalent penalty.
   const totalCells = Math.max(1, table.rows.length * plans.length);
-  const errorWeight = issues.reduce((s, i) => s + (i.severity === "error" ? 1 : 0.4), 0);
+  const cellWeight = issues.reduce((s, i) => s + (i.severity === "error" ? 1 : 0.4), 0);
+  const errorWeight = cellWeight + duplicateRows.length * 0.4;
   const healthScore = Math.max(0, Math.round(100 - (errorWeight / totalCells) * 100));
 
   return {
@@ -125,30 +130,39 @@ export function validateTable(table: Table, plan?: ColumnPlan[]): ValidationResu
     rowCount: table.rows.length,
     columns,
     issues,
+    duplicateRows,
     healthScore,
-    summary: buildSummary(table.rows.length, issues.length, healthScore),
+    summary: buildSummary(table.rows.length, issues.length, duplicateRows.length, healthScore),
   };
 }
 
-function buildSummary(rows: number, issueCount: number, score: number): string {
-  if (issueCount === 0) return `All ${rows} rows look clean — ready to onboard.`;
+function buildSummary(rows: number, issueCount: number, duplicateCount: number, score: number): string {
+  if (issueCount === 0 && duplicateCount === 0) return `All ${rows} rows look clean — ready to onboard.`;
   const verdict = score >= 90 ? "mostly clean" : score >= 70 ? "needs light cleanup" : "needs attention";
-  return `${rows} rows scanned · ${issueCount} issue${issueCount === 1 ? "" : "s"} found · ${verdict}.`;
+  const dupePart = duplicateCount > 0 ? ` · ${duplicateCount} duplicate row${duplicateCount === 1 ? "" : "s"}` : "";
+  return `${rows} rows scanned · ${issueCount} issue${issueCount === 1 ? "" : "s"} found${dupePart} · ${verdict}.`;
 }
 
-/** Produce a cleaned copy of the table by applying every suggested fix. */
+/**
+ * Produce a cleaned copy of the table: apply every suggested cell fix and drop
+ * duplicate rows (keeping the first occurrence).
+ */
 export function cleanTable(table: Table, plan?: ColumnPlan[]): Table {
   const plans = plan ?? planColumns(table);
   const byIndex = new Map(plans.map((p) => [p.index, p]));
+  const duplicates = new Set(findDuplicateRows(table));
 
-  const rows = table.rows.map((row, rowIndex) =>
-    row.map((cell, colIndex) => {
-      const p = byIndex.get(colIndex);
-      if (!p) return cell;
-      const issue = validateCell(p, rowIndex, cell ?? "");
-      return issue?.suggestedFix ?? cell;
-    })
-  );
+  const rows = table.rows
+    .map((row, rowIndex) => ({ row, rowIndex }))
+    .filter(({ rowIndex }) => !duplicates.has(rowIndex))
+    .map(({ row, rowIndex }) =>
+      row.map((cell, colIndex) => {
+        const p = byIndex.get(colIndex);
+        if (!p) return cell;
+        const issue = validateCell(p, rowIndex, cell ?? "");
+        return issue?.suggestedFix ?? cell;
+      })
+    );
 
   return { headers: table.headers, rows };
 }

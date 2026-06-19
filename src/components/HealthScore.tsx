@@ -9,6 +9,7 @@ interface HealthScoreProps {
   rowCount: number;
   issueCount: number;
   columnCount: number;
+  duplicateCount: number;
 }
 
 function tone(score: number): { color: string; label: string } {
@@ -17,7 +18,7 @@ function tone(score: number): { color: string; label: string } {
   return { color: "var(--bad)", label: "Needs attention" };
 }
 
-export function HealthScore({ score, baseline, summary, rowCount, issueCount, columnCount }: HealthScoreProps) {
+export function HealthScore({ score, baseline, summary, rowCount, issueCount, columnCount, duplicateCount }: HealthScoreProps) {
   const { color, label } = tone(score);
   const delta = baseline !== undefined ? score - baseline : 0;
   const R = 52;
@@ -69,6 +70,10 @@ export function HealthScore({ score, baseline, summary, rowCount, issueCount, co
           <div>
             <dt>Issues</dt>
             <dd>{issueCount.toLocaleString()}</dd>
+          </div>
+          <div>
+            <dt>Duplicates</dt>
+            <dd>{duplicateCount.toLocaleString()}</dd>
           </div>
         </dl>
       </div>

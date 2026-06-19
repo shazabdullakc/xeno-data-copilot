@@ -32,7 +32,13 @@ for (const i of result.issues) {
   console.log(`  row ${i.rowIndex + 1} [${i.column}] ${i.severity}: ${i.message} (raw: "${i.rawValue}")${fix}`);
 }
 
+console.log(
+  `\nDuplicate rows: ${result.duplicateRows.length}` +
+    (result.duplicateRows.length ? ` (rows ${result.duplicateRows.map((r) => r + 1).join(", ")})` : "")
+);
+
 const cleaned = cleanTable(table, plan);
+console.log(`Cleaned row count: ${cleaned.rows.length} (from ${table.rows.length} — duplicates dropped)`);
 const chunks = chunkTable(cleaned, 10, "cleaned_transactions");
 console.log(`\nCleaned output → ${chunks.length} chunk(s): ${chunks.map((c) => c.filename).join(", ")}`);
 console.log("\nFirst 3 cleaned rows:");

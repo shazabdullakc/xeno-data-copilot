@@ -70,5 +70,22 @@ A complete, deployable product on top of the engine.
 - Engine cross-checked against a real 300-row dataset: counts matched exactly
   (80 empty emails, 0 bad phones, all `DD-MM-YYYY` dates, 98/100 health).
 
+## [0.4.0] — Bulk fix, health delta & duplicate detection
+
+### Added
+- **One-click "Fix all auto-fixable"**: batch-applies every machine-safe fix
+  (normalized phones, trimmed amounts, reformatted dates) as overrides; manual-
+  review issues are left untouched.
+- **Live health-score delta**: a `▲ +N from <baseline>` pill that climbs as fixes
+  land, baselined from the untouched file.
+- **Duplicate-row detection** (`detect/duplicates.ts`): exact-row integrity check
+  with trimmed, case-insensitive matching. Surfaced as a count + banner; the
+  cleaned export drops duplicates (keeping the first occurrence).
+- Sample dataset now includes a case/spacing-variant duplicate to demo the check.
+
+### Verified
+- `npm run smoke` — detects 1 duplicate (row 16) and emits 15 cleaned rows from 16.
+- `npm run build` — green, 147 kB first load JS.
+
 ## [Unreleased]
 - Record the 2-minute walkthrough video.

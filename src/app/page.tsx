@@ -96,6 +96,7 @@ export default function Home() {
             rowCount={result.rowCount}
             issueCount={result.issues.length}
             columnCount={result.columns.length}
+            duplicateCount={result.duplicateRows.length}
           />
 
           <ColumnGrid plan={state.plan} columns={result.columns} onPlanChange={onPlanChange} />
@@ -105,6 +106,18 @@ export default function Home() {
               Issues &amp; fixes
               {editCount > 0 && <span className={styles.editBadge}>{editCount} manually edited</span>}
             </h2>
+            {result.duplicateRows.length > 0 && (
+              <div className={styles.dupeNote} role="status">
+                <strong>
+                  ⚠ {result.duplicateRows.length} duplicate{" "}
+                  {result.duplicateRows.length === 1 ? "row" : "rows"} detected
+                </strong>
+                <span>
+                  Row {result.duplicateRows.slice(0, 8).map((r) => r + 1).join(", ")}
+                  {result.duplicateRows.length > 8 ? "…" : ""} — automatically removed from the cleaned export.
+                </span>
+              </div>
+            )}
             <IssuesPanel issues={result.issues} onEdit={onEdit} onFixAll={onFixAll} />
           </div>
 
