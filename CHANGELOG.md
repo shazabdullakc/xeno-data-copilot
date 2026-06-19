@@ -54,5 +54,21 @@ A complete, deployable product on top of the engine.
 ### Verified
 - `npm run build` — compiles, type-checks, static-exports; 146 kB first load JS.
 
+## [0.3.0] — Inline manual editing & deployment
+
+### Added
+- **GitHub Pages deployment** via Actions (`.github/workflows/deploy.yml`) with a
+  configurable `basePath` for subpath hosting.
+- **Inline manual editing**: every flagged cell is editable in the issues list.
+  Auto-fixable issues offer a one-click "use fix"; manual-review issues accept a
+  typed value. Edits re-validate live and feed the cleaned export.
+- Edits are stored as **non-destructive overrides** on the original table
+  (`applyOverrides` in `process.ts`); a "N manually edited" badge tracks them.
+- `smoke.ts` now accepts a CSV path argument for testing arbitrary files.
+
+### Verified
+- Engine cross-checked against a real 300-row dataset: counts matched exactly
+  (80 empty emails, 0 bad phones, all `DD-MM-YYYY` dates, 98/100 health).
+
 ## [Unreleased]
-- Deploy to a public URL; record the 2-minute walkthrough.
+- Record the 2-minute walkthrough video.
