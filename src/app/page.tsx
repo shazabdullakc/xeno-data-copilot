@@ -17,14 +17,21 @@ interface State {
   plan: ColumnPlan[];
   overrides: Overrides; // manual cell fixes, keyed "row:col"
   baseName: string;
+  baseline: number; // health score of the untouched file, for the delta
 }
 
 export default function Home() {
   const [state, setState] = useState<State | null>(null);
 
   const load = useCallback((text: string, name: string) => {
-    const { table, plan } = processCsv(text);
-    setState({ table, plan, overrides: {}, baseName: name.replace(/\.csv$/i, "") + "_cleaned" });
+    const { table, plan, result } = processCsv(text);
+    setState({
+      table,
+      plan,
+      overrides: {},
+      baseName: name.replace(/\.csv$/i, "") + "_cleaned",
+      baseline: result.healthScore,
+    });
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
@@ -48,6 +55,20 @@ export default function Home() {
   const cleaned = useMemo(() => (effective && state ? cleanTable(effective, state.plan) : null), [effective, state]);
   const editCount = state ? Object.keys(state.overrides).length : 0;
 
+  // Apply every machine-safe fix at once — turns each auto-fixable issue into an override.
+  const onFixAll = useCallback(() => {
+    setState((prev) => {
+      if (!prev || !result) return prev;
+      const batch: Overrides = {};
+      for (const issue of result.issues) {
+        if (issue.suggestedFix === undefined) continue;
+        const col = prev.plan.find((p) => p.name === issue.column);
+        if (col) batch[`${issue.rowIndex}:${col.index}`] = issue.suggestedFix;
+      }
+      return { ...prev, overrides: { ...prev.overrides, ...batch } };
+    });
+  }, [result]);
+
   return (
     <main className={styles.main}>
       <header className={styles.hero}>
@@ -70,6 +91,7 @@ export default function Home() {
         <div className={styles.results}>
           <HealthScore
             score={result.healthScore}
+            baseline={state.baseline}
             summary={result.summary}
             rowCount={result.rowCount}
             issueCount={result.issues.length}
@@ -83,7 +105,7 @@ export default function Home() {
               Issues &amp; fixes
               {editCount > 0 && <span className={styles.editBadge}>{editCount} manually edited</span>}
             </h2>
-            <IssuesPanel issues={result.issues} onEdit={onEdit} />
+            <IssuesPanel issues={result.issues} onEdit={onEdit} onFixAll={onFixAll} />
           </div>
 
           <DownloadBar cleaned={cleaned} issues={result.issues} baseName={state.baseName} onReset={() => setState(null)} />

@@ -11,9 +11,10 @@ const PAGE = 50;
 interface IssuesPanelProps {
   issues: readonly CellIssue[];
   onEdit: (rowIndex: number, column: string, value: string) => void;
+  onFixAll: () => void;
 }
 
-export function IssuesPanel({ issues, onEdit }: IssuesPanelProps) {
+export function IssuesPanel({ issues, onEdit, onFixAll }: IssuesPanelProps) {
   const [filter, setFilter] = useState<Filter>("all");
   const [limit, setLimit] = useState(PAGE);
 
@@ -39,10 +40,17 @@ export function IssuesPanel({ issues, onEdit }: IssuesPanelProps) {
 
   return (
     <section aria-label="Issues found">
-      <div className={styles.tabs} role="tablist">
-        <Tab active={filter === "all"} onClick={() => setFilter("all")} label={`All ${issues.length}`} />
-        <Tab active={filter === "error"} onClick={() => setFilter("error")} label={`Errors ${errorCount}`} />
-        <Tab active={filter === "fixable"} onClick={() => setFilter("fixable")} label={`Auto-fixable ${fixableCount}`} />
+      <div className={styles.toolbar}>
+        <div className={styles.tabs} role="tablist">
+          <Tab active={filter === "all"} onClick={() => setFilter("all")} label={`All ${issues.length}`} />
+          <Tab active={filter === "error"} onClick={() => setFilter("error")} label={`Errors ${errorCount}`} />
+          <Tab active={filter === "fixable"} onClick={() => setFilter("fixable")} label={`Auto-fixable ${fixableCount}`} />
+        </div>
+        {fixableCount > 0 && (
+          <button type="button" className={styles.fixAll} onClick={onFixAll}>
+            ⚡ Fix all {fixableCount} auto-fixable
+          </button>
+        )}
       </div>
 
       <ul className={styles.list}>

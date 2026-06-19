@@ -4,6 +4,7 @@ import styles from "./HealthScore.module.css";
 
 interface HealthScoreProps {
   score: number; // 0..100
+  baseline?: number; // score of the untouched file; shows a "+N" delta as you fix
   summary: string;
   rowCount: number;
   issueCount: number;
@@ -16,8 +17,9 @@ function tone(score: number): { color: string; label: string } {
   return { color: "var(--bad)", label: "Needs attention" };
 }
 
-export function HealthScore({ score, summary, rowCount, issueCount, columnCount }: HealthScoreProps) {
+export function HealthScore({ score, baseline, summary, rowCount, issueCount, columnCount }: HealthScoreProps) {
   const { color, label } = tone(score);
+  const delta = baseline !== undefined ? score - baseline : 0;
   const R = 52;
   const C = 2 * Math.PI * R;
   const offset = C * (1 - score / 100);
@@ -44,9 +46,16 @@ export function HealthScore({ score, summary, rowCount, issueCount, columnCount 
       </div>
 
       <div className={styles.body}>
-        <span className={styles.badge} style={{ background: color }}>
-          {label}
-        </span>
+        <div className={styles.badgeRow}>
+          <span className={styles.badge} style={{ background: color }}>
+            {label}
+          </span>
+          {delta > 0 && (
+            <span className={styles.delta} aria-label={`Improved by ${delta} points from ${baseline}`}>
+              ▲ +{delta} from {baseline}
+            </span>
+          )}
+        </div>
         <p className={styles.summary}>{summary}</p>
         <dl className={styles.stats}>
           <div>
